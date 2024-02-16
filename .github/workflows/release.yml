@@ -1,0 +1,49 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build_release_x64:
+    name: Build Release x64
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: macos-latest
+            release_suffix: mac-amd64
+          - os: ubuntu-latest
+            release_suffix: linux-x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1
+        with:
+          crystal: latest
+      - name: Run Linux Build
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          mkdir -p bin
+          chmod 755 bin
+          docker run -d --name alpine -v $(pwd):/workspace -w /workspace crystallang/crystal:latest-alpine tail -f /dev/null
+          docker exec alpine apk add cmake build-base readline-dev readline-static ncurses-dev ncurses-static ncurses-libs 
+          docker exec alpine crystal src/main.cr release --static
+          docker exec alpine chmod +x bin/gemster
+          zip -j bin/gemster-linux.zip bin/gemster
+      - name: Run Mac Build x64
+        if: matrix.os == 'macos-latest'
+        run: |
+          crystal src/main.cr release
+          chmod +x bin/gemster
+          zip -j bin/gemster-macos.zip bin/gemster
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            bin/gemster-linux.zip
+            bin/gemster-macos.zip
+            LICENSE.txt

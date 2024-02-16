@@ -1,0 +1,16 @@
+name: gemster
+version: 0.1.0
+
+crystal: ">= 1.11.2"
+
+targets:
+  gemster:
+    main: src/main.cr
+
+authors:
+  - redpeacock78 <webmaster@redpeacock78>
+
+description: |
+  Simple task runner with file watch & hot reload functions
+
+license: MIT

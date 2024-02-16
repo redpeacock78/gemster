@@ -1,0 +1,33 @@
+---
+tasks:
+  build:
+    cmd: "mkdir -p bin && crystal build --progress src/main.cr -o ./bin/main"
+    desc: "Build an executable"
+  release:
+    cmd: "shards build --release"
+    desc: "Build executable files for release"
+  run:
+    cmd: "crystal src/main.cr"
+    desc: "Build and run program"
+  fmt:
+    cmd: "crystal tool format"
+    desc: "Format project, directories and/or files"
+  fmt:watch:
+    deps: fmt
+    desc: "Watching Format project, directories and/or files"
+    ignore: ["./bin/**/*", "./**/**/*.yml"]
+    ext: ["cr"]
+    watch: true
+  build:watch:
+    deps:
+      - fmt
+      - build
+    desc: "Watching Format project and Build an executable"
+    ignore: ["bin/**/*", "**/**/*.yml"]
+    match: ["src/**/*"]
+    ext: ["cr"]
+    watch: true
+  greeting:
+    cmd: "echo $GREETING"
+    env:
+      GREETING: "Hello World!"
