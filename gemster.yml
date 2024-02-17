@@ -12,6 +12,10 @@ tasks:
   fmt:
     cmd: "crystal tool format"
     desc: "Format project, directories and/or files"
+  tag:
+    cmd: |
+      git tag v$(shards version)
+      git push origin v$(shards version)
   fmt:watch:
     deps: fmt
     desc: "Watching Format project, directories and/or files"
