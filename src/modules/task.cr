@@ -9,16 +9,30 @@ end
 def show_tasks(yml : YAML::Any)
   check_syntax({yml: yml})
   tasks : YAML::Any = yml["tasks"]
-  puts "💎 Available Tasks"
+  puts "#{"💎 Available Tasks".colorize.bright}"
   tasks.as_h.keys.map do |key|
     desc : String | YAML::Any
     begin
-      desc = tasks[key]["desc"]? || tasks[key]["cmd"]? || tasks[key]["deps"].as_a.join(" -> ")
+      desc = tasks[key]["desc"]? || ""
     rescue
-      desc = tasks[key]["desc"]? || tasks[key]["cmd"]? || tasks[key]["deps"]
+      desc = tasks[key]["desc"]? || ""
     end
-    desc = desc.to_s.index("\n") != nil ? desc.to_s.split("\n").reject { |i| i.empty? }.map { |i| "    #{i}" }.join("\n") : "    #{desc.to_s}"
-    puts "- #{key}\n#{desc}"
+    cmd = ""
+    if tasks[key]["cmd"]?
+      cmd = tasks[key]["cmd"]?
+      cmd = cmd.to_s.index("\n") != nil ? cmd.to_s.split("\n").reject { |i| i.empty? }.map { |i| "    $ #{i}" }.join("\n") : "    $ #{cmd.to_s}"
+    else
+      begin
+        cmd = "#{tasks[key]["deps"].as_a.map{|i| "    > #{i}"}.join("\n")}"
+      rescue
+        cmd = "    > #{tasks[key]["deps"]}"
+      end
+    end
+    if tasks[key]["desc"]?
+      puts "• #{key.colorize(:light_blue)}\n  #{tasks[key]["desc"]?.to_s}\n#{cmd.colorize(:dark_gray)}"
+    else
+      puts "• #{key.colorize(:light_blue)}\n#{cmd.colorize(:dark_gray)}"
+    end
   end
 end
 
