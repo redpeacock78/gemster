@@ -1,6 +1,11 @@
 require "colorize"
 require "../libs/*"
 
+private def start_task_message(task_name, dep_task_name, cmd)
+  puts "#{"Task".colorize(:light_green)} #{task_name.colorize(:cyan)} #{dep_task_name.size > 0 ? "#{File.basename(Process.executable_path.to_s)} #{dep_task_name}" : "#{cmd}"}"
+  puts "#{"[*]".colorize(:light_blue)} v#{version}"
+end
+
 def show_tasks(yml : YAML::Any)
   check_syntax({yml: yml})
   tasks : YAML::Any = yml["tasks"]
@@ -12,7 +17,8 @@ def show_tasks(yml : YAML::Any)
     rescue
       desc = tasks[key]["desc"]? || tasks[key]["cmd"]? || tasks[key]["deps"]
     end
-    puts "- #{key}\n    #{desc.to_s.gsub("\n") { "\n    " }}"
+    desc = desc.to_s.index("\n") != nil ? desc.to_s.split("\n").reject { |i| i.empty? }.map { |i| "    #{i}" }.join("\n") : "    #{desc.to_s}"
+    puts "- #{key}\n#{desc}"
   end
 end
 
@@ -39,6 +45,8 @@ def run_task(yml : YAML::Any, args : Array(String))
     cmd_args = " #{args.join(" ")}"
   end
 
+  cmd = "#{cmd.gsub(/\\\n/, "").gsub("\n", "; ").sub(/; $/, "")}#{cmd_args}"
+
   env : Hash(String, String) = ENV.keys.map { |key| [key, ENV[key]] }.to_h
   begin
     if yml["tasks"][task_name]["env"]? != nil
@@ -49,15 +57,14 @@ def run_task(yml : YAML::Any, args : Array(String))
   rescue
   end
 
-  puts "#{"Task".colorize(:light_green)} #{task_name.colorize(:cyan)} #{dep_task_name.size > 0 ? "#{File.basename(Process.executable_path.to_s)} #{dep_task_name}" : "#{cmd.gsub("\n") { " " }}#{cmd_args}"}"
-  puts "#{"[*]".colorize(:light_blue)} v#{version}"
+  start_task_message(task_name, dep_task_name, cmd)
 
   if yml["tasks"][task_name]["watch"]? != nil && yml["tasks"][task_name]["watch"]? == true
     ext_list : Array(String) | Array(YAML::Any) = yml["tasks"][task_name]["ext"]? != nil ? yml["tasks"][task_name]["ext"].as_a : [] of String
     match_list : Array(String) | Array(YAML::Any) = yml["tasks"][task_name]["match"]? != nil ? yml["tasks"][task_name]["match"].as_a : [] of String
     ignore_list : Array(String) | Array(YAML::Any) = yml["tasks"][task_name]["ignore"]? != nil ? yml["tasks"][task_name]["ignore"].as_a : [] of String
-    env != nil ? run_watcher("#{cmd.gsub("\n") { " " }}#{cmd_args}", ignore_list, match_list, ext_list, env) : run_watcher("#{cmd.gsub("\n") { " " }}#{cmd_args}", ignore_list, match_list, ext_list)
+    env != nil ? run_watcher(cmd, ignore_list, match_list, ext_list, env) : run_watcher(cmd, ignore_list, match_list, ext_list)
   else
-    env != nil ? run_command("#{cmd.gsub("\n") { " " }}#{cmd_args}", env) : run_command("#{cmd.gsub("\n") { " " }}#{cmd_args}")
+    env != nil ? run_command(cmd, env) : run_command(cmd)
   end
 end
