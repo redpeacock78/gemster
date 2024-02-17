@@ -47,3 +47,14 @@ jobs:
             bin/gemster-linux.zip
             bin/gemster-macos.zip
             LICENSE.txt
+      - name: Extract version
+        id: extract-version
+        run: echo "version=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: Bump Homebrew formula
+        uses: mislav/bump-homebrew-formula-action@v3
+        with:
+          formula-name: gemster
+          homebrew-tap: redpeacock78/homebrew-gemster
+          download-url: https://github.com/redpeacock78/gemster/archive/refs/tags/${{ steps.extract-version.outputs.version }}.tar.gz
+        env:
+          COMITTER_TOKEN: ${{ secrets.COMITTER_TOKEN }}
