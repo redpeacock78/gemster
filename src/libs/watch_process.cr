@@ -39,11 +39,11 @@ private def ext_list(args : NamedTuple(ext: Array(String) | Array(YAML::Any), fi
   ext_list
 end
 
-private def watch_message(path_list : Array(String), ext_list : Array(String), cmd : String, status : Bool = false)
-  puts "#{"[*]".colorize(:light_blue)} restarting due to changes..." if status
+private def watch_message(path_list : Array(String), ext_list : Array(String), cmd : String, restart : Bool = false)
+  puts "#{"[*]".colorize(:light_blue)} restarting due to changes..." if restart
   puts "#{"[*]".colorize(:light_blue)} watching path(s): #{path_list.join(", ")}"
-  puts "#{"[*]".colorize(:light_blue)} watching extensions: #{ext_list.join(", ")}"
-  puts "#{"[!]".colorize(:light_yellow)} starting `#{cmd}`"
+  puts "#{"[*]".colorize(:light_blue)} watching extension(s): #{ext_list.join(", ")}"
+  puts "#{"[!]".colorize(:light_yellow)} starting `#{cmd.colorize(:cyan)}`"
 end
 
 def watch_process(args)
