@@ -8,7 +8,7 @@ def check_syntax(data)
     begin
       task = data.to_h[:task]
       if data.[:yml]["tasks"][task]? == nil
-        puts "#{"[E]".colorize(:light_red)} Task name '#{task}'' is not set."
+        puts "#{"[E]".colorize(:light_red)} Task name `#{task.colorize(:cyan)}` is not set."
         exit(1)
       end
       if data.[:yml]["tasks"][task]["cmd"]? == nil
