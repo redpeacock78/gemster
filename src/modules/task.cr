@@ -2,38 +2,31 @@ require "colorize"
 require "../libs/*"
 
 private def start_task_message(task_name, dep_task_name, cmd)
-  puts "#{"Task".colorize(:light_green)} #{task_name.colorize(:cyan)} #{dep_task_name.size > 0 ? "#{File.basename(Process.executable_path.to_s)} #{dep_task_name}" : "#{cmd}"}"
+  name : String = dep_task_name.size > 0 ? "#{File.basename(Process.executable_path.to_s)} #{dep_task_name}" : "#{cmd}"
+  puts "#{"Task".colorize(:light_green)} #{task_name.colorize(:cyan)} #{name.colorize(:dark_gray)}"
   puts "#{"[*]".colorize(:light_blue)} v#{version}"
 end
 
 def show_tasks(yml : YAML::Any)
   check_syntax({yml: yml})
   tasks : YAML::Any = yml["tasks"]
-  puts "#{"💎 Available Tasks".colorize.bright}"
+  message : String = "#{"💎 Available Tasks".colorize.bright}"
   tasks.as_h.keys.map do |key|
-    desc : String | YAML::Any
-    begin
-      desc = tasks[key]["desc"]? || ""
-    rescue
-      desc = tasks[key]["desc"]? || ""
-    end
-    cmd = ""
+    desc : String = tasks[key]["desc"]? ? "  #{tasks[key]["desc"]?.to_s}" : ""
+    cmd : String = ""
     if tasks[key]["cmd"]?
-      cmd = tasks[key]["cmd"]?
-      cmd = cmd.to_s.index("\n") != nil ? cmd.to_s.split("\n").reject { |i| i.empty? }.map { |i| "    $ #{i}" }.join("\n") : "    $ #{cmd.to_s}"
+      cmd = tasks[key]["cmd"]?.to_s
+      cmd = cmd.index("\n") != nil ? cmd.split("\n").reject { |i| i.empty? }.map { |i| "#{"    $ #{i}".colorize(:dark_gray)}" }.join("\n") : "#{"    $ #{cmd}".colorize(:dark_gray)}"
     else
       begin
-        cmd = "#{tasks[key]["deps"].as_a.map{|i| "    > #{i}"}.join("\n")}"
+        cmd = "#{tasks[key]["deps"].as_a.map { |i| "    > #{i}" }.join("\n").colorize(:dark_gray)}"
       rescue
-        cmd = "    > #{tasks[key]["deps"]}"
+        cmd = "#{"    > #{tasks[key]["deps"]}".colorize(:dark_gray)}"
       end
     end
-    if tasks[key]["desc"]?
-      puts "• #{key.colorize(:light_blue)}\n  #{tasks[key]["desc"]?.to_s}\n#{cmd.colorize(:dark_gray)}"
-    else
-      puts "• #{key.colorize(:light_blue)}\n#{cmd.colorize(:dark_gray)}"
-    end
+    message += desc.size > 0 ? "\n• #{key.colorize(:light_blue)}\n#{desc}\n#{cmd}" : "\n• #{key.colorize(:light_blue)}\n#{cmd}"
   end
+  puts message
 end
 
 def run_task(yml : YAML::Any, args : Array(String))
