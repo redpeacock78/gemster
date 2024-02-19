@@ -43,7 +43,7 @@ def run_task(yml : YAML::Any, args : Array(String))
       cmd = yml["tasks"][dep_task_name]["cmd"].to_s
     rescue
       dep_task_name = yml["tasks"][task_name]["deps"].as_a.map { |i| i.to_s }
-      cmd = dep_task_name.map { |i| yml["tasks"][i]["cmd"].to_s }.join("; ")
+      cmd = dep_task_name.map { |i| yml["tasks"][i]["cmd"].to_s }.join(" && ")
       dep_task_name = dep_task_name.join(" ")
     end
   end
