@@ -3,28 +3,29 @@ require "../libs/*"
 
 private def start_task_message(task_name, dep_task_name, cmd)
   name : String = dep_task_name.size > 0 ? "#{File.basename(Process.executable_path.to_s)} #{dep_task_name}" : "#{cmd}"
-  puts "#{"Task".colorize(:light_green)} #{task_name.colorize(:cyan)} #{name.colorize(:dark_gray)}"
+  puts "#{"Task".colorize(:light_green)} #{task_name.colorize(:cyan)} #{name.colorize(:light_gray)}"
   puts "#{"[*]".colorize(:light_blue)} v#{version}"
 end
 
 def show_tasks(yml : YAML::Any)
   check_syntax({yml: yml})
   tasks : YAML::Any = yml["tasks"]
-  message : String = "#{"💎 Available Tasks".colorize.bright}"
+  message : String = "#{"💎 Available Tasks".colorize.bright}\n"
   tasks.as_h.keys.map do |key|
     desc : String = tasks[key]["desc"]? ? "  #{tasks[key]["desc"]?.to_s}" : ""
     cmd : String = ""
     if tasks[key]["cmd"]?
       cmd = tasks[key]["cmd"]?.to_s
-      cmd = cmd.index("\n") != nil ? cmd.split("\n").reject { |i| i.empty? }.map { |i| "#{"    $ #{i}".colorize(:dark_gray)}" }.join("\n") : "#{"    $ #{cmd}".colorize(:dark_gray)}"
+      cmd = cmd.index("\n") != nil ? cmd.split("\n").reject { |i| i.empty? }.map { |i| "#{"    $ #{i}".colorize(:light_gray)}" }.join("\n") : "#{"    $ #{cmd}".colorize(:light_gray)}"
     else
       begin
-        cmd = "#{tasks[key]["deps"].as_a.map { |i| "    > #{i}" }.join("\n").colorize(:dark_gray)}"
+        cmd = "#{tasks[key]["deps"].as_a.map { |i| "    > #{i}" }.join("\n").colorize(:light_gray)}"
       rescue
-        cmd = "#{"    > #{tasks[key]["deps"]}".colorize(:dark_gray)}"
+        cmd = "#{"    > #{tasks[key]["deps"]}".colorize(:light_gray)}"
       end
     end
-    message += desc.size > 0 ? "\n• #{key.colorize(:light_blue)}\n#{desc}\n#{cmd}" : "\n• #{key.colorize(:light_blue)}\n#{cmd}"
+    task_name : String = "#{"• #{key.colorize(:light_blue)}"}"
+    message += desc.size > 0 ? "#{task_name}\n#{desc}\n#{cmd}\n" : "#{task_name}\n#{cmd}\n"
   end
   puts message
 end
