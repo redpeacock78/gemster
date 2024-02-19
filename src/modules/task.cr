@@ -1,10 +1,11 @@
 require "colorize"
 require "../libs/*"
 
-private def start_task_message(task_name, dep_task_name, cmd)
+private def start_task_message(task_name, dep_task_name, cmd, watch_status = false)
   name : String = dep_task_name.size > 0 ? "#{File.basename(Process.executable_path.to_s)} #{dep_task_name}" : "#{cmd}"
   puts "#{"Task".colorize(:light_green)} #{task_name.colorize(:cyan)} #{name.colorize(:light_gray)}"
   puts "#{"[*]".colorize(:light_blue)} v#{version}"
+  puts "#{"[!]".colorize(:light_yellow)} Commands to execute: `#{cmd.colorize(:cyan)}`" if dep_task_name.size > 0 && watch_status == false
 end
 
 def show_tasks(yml : YAML::Any)
@@ -65,14 +66,14 @@ def run_task(yml : YAML::Any, args : Array(String))
   rescue
   end
 
-  start_task_message(task_name, dep_task_name, cmd)
-
   if yml["tasks"][task_name]["watch"]? != nil && yml["tasks"][task_name]["watch"]? == true
+    start_task_message(task_name, dep_task_name, cmd, true)
     ext_list : Array(String) | Array(YAML::Any) = yml["tasks"][task_name]["ext"]? != nil ? yml["tasks"][task_name]["ext"].as_a : [] of String
     match_list : Array(String) | Array(YAML::Any) = yml["tasks"][task_name]["match"]? != nil ? yml["tasks"][task_name]["match"].as_a : [] of String
     ignore_list : Array(String) | Array(YAML::Any) = yml["tasks"][task_name]["ignore"]? != nil ? yml["tasks"][task_name]["ignore"].as_a : [] of String
     env != nil ? run_watcher(cmd, ignore_list, match_list, ext_list, env) : run_watcher(cmd, ignore_list, match_list, ext_list)
   else
+    start_task_message(task_name, dep_task_name, cmd)
     env != nil ? run_command(cmd, env) : run_command(cmd)
   end
 end
