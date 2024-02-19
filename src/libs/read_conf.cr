@@ -9,7 +9,7 @@ def read_conf
   conf_file_path = "#{pwd}/#{conf_file_name}.yaml" if File.exists?("#{pwd}/#{conf_file_name}.yaml")
   if conf_file_path.size == 0
     puts "#{"[E]".colorize(:light_red)} Cannot find `#{conf_file_name}.yml` or `#{conf_file_name}.yaml` in the current directory!"
-    puts "#{"[*]".colorize(:light_blue)} You can create a config to add scripts to with `#{File.basename(Process.executable_path.to_s)} --init`."
+    puts "#{"[*]".colorize(:light_blue)} You can create a config to add scripts to with `#{File.basename(Process.executable_path.to_s).colorize(:light_blue)} #{"--init".colorize(:light_yellow)}`."
     exit(1)
   end
   begin
