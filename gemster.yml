@@ -6,6 +6,27 @@ tasks:
   release:
     cmd: "shards build --release"
     desc: "Build executable files for release"
+  deploy:
+    cmd: "cp $(pwd)/bin/gemster ${PREFIX}/gemster && chmod +x ${PREFIX}/gemster"
+    desc: "Copy the generated binary to the path"
+    env:
+      PREFIX: /usr/local/bin
+  clean:
+    cmd: "rm -rf $(pwd)/bin"
+    desc: "Delete generated binaries"
+  install:
+    deps:
+      - release
+      - deploy
+      - clean
+    desc: "Execute builds, grant execute permissions, deploy binaries, and delete binaries all at once"
+    env:
+      PREFIX: /usr/local/bin
+  uninstall:
+    cmd: "rm -rf ${PREFIX}/gemster"
+    desc: "Uninstall installed commands"
+    env:
+      PREFIX: /usr/local/bin
   run:
     cmd: "crystal src/main.cr"
     desc: "Build and run program"
