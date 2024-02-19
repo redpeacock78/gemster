@@ -3,12 +3,13 @@ require "yaml"
 require "colorize"
 
 def show_help
-  authors : String = "redpeacock78"
   name : String = File.basename(Process.executable_path.to_s)
+  authors : String = {{ `awk 'NR==11{print $2}' < shard.yml`.chomp.stringify }}
+  description : String = {{ `awk 'NR==14{print}' < shard.yml | cut -d' ' -f 3-`.chomp.stringify }}
 
   puts "#{name.upcase.colorize(:light_blue)} - #{version}"
   puts "Created by #{authors}"
-  puts "Simple task runner with file watch & hot reload functions"
+  puts "#{description}"
   puts ""
   puts "Usage:"
   puts "    #{name.colorize(:light_blue)} #{"<task name>".colorize(:light_yellow)}"
