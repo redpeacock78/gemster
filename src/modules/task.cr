@@ -28,6 +28,7 @@ def show_tasks(yml : YAML::Any)
     task_name : String = "#{"• #{key.colorize(:light_blue)}"}"
     message += desc.size > 0 ? "#{task_name}\n#{desc}\n#{cmd}\n" : "#{task_name}\n#{cmd}\n"
   end
+  puts "#{"[*]".colorize(:light_blue)} v#{version}"
   puts message
 end
 
@@ -56,8 +57,9 @@ def run_task(yml : YAML::Any, args : Array(String))
 
   cmd = "#{cmd.gsub(/\\\n/, "").gsub("\n", "; ").sub(/; $/, "")}#{cmd_args}"
 
-  env : Hash(String, String) = ENV.keys.map { |key| [key, ENV[key]] }.to_h
+  env : Hash(String, String) | Nil = nil
   begin
+    env = ENV.keys.map { |key| [key, ENV[key]] }.to_h
     if yml["tasks"][task_name]["env"]? != nil
       env = yml["tasks"][task_name]["env"].as_h.map { |key, val| [key.to_s, val.to_s] }.to_h.merge(env)
     elsif yml["tasks"][yml["tasks"][task_name]["deps"]?]["env"]? != nil
