@@ -7,7 +7,7 @@ tasks:
     cmd: "shards build --release"
     desc: "Build executable files for release"
   deploy:
-    cmd: "cp $(pwd)/bin/gemster ${PREFIX}/gemster && chmod +x ${PREFIX}/gemster"
+    cmd: "\\cp -f $(pwd)/bin/gemster ${PREFIX}/gemster && chmod +x ${PREFIX}/gemster"
     desc: "Copy the generated binary to the path"
     env:
       PREFIX: /usr/local/bin
@@ -56,3 +56,5 @@ tasks:
     cmd: "echo $GREETING"
     env:
       GREETING: "Hello World!"
+  test:
+    cmd: "exit 1"
