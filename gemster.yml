@@ -24,7 +24,12 @@ tasks:
       PREFIX: /usr/local/bin
   uninstall:
     cmd: "rm -rf ${PREFIX}/gemster"
-    desc: "Uninstall installed commands"
+    desc: "Uninstall installed command"
+    env:
+      PREFIX: /usr/local/bin
+  update:
+    cmd: "git pull && sudo crystal src/main.cr install"
+    desc: "Update installed command"
     env:
       PREFIX: /usr/local/bin
   run:
