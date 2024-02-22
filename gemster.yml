@@ -40,8 +40,9 @@ tasks:
     desc: "Format project, directories and/or files"
   tag:
     cmd: |
-      git tag v$(shards version)
-      git push origin v$(shards version)
+      version="v$(shards version)"
+      git tag ${version}
+      git push origin ${version}
   fmt:watch:
     deps: fmt
     desc: "Watching Format project, directories and/or files"
