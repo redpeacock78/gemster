@@ -61,5 +61,3 @@ tasks:
     cmd: "echo $GREETING"
     env:
       GREETING: "Hello World!"
-  test:
-    cmd: "exit 1"
