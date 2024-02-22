@@ -28,7 +28,7 @@ tasks:
     env:
       PREFIX: /usr/local/bin
   update:
-    cmd: "git pull && sudo crystal src/main.cr install"
+    cmd: "git pull && sudo gemster install"
     desc: "Update installed command"
     env:
       PREFIX: /usr/local/bin
